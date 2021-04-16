@@ -28,7 +28,7 @@ var canvas,
     enemy_y = -45,
     enemy_w = 50,
     enemy_h = 38,
-    speed = 7,
+    speed = 5,
     enemy,
     rightKey = false,
     leftKey = false,
@@ -36,34 +36,34 @@ var canvas,
     downKey = false,
     ship,
     ship_x = (width / 2) - 25, ship_y = height - 75, ship_w = 50, ship_h = 57,
-    laserTotal = 2,
+    laserTotal = 5,
     lasers = [],
     score = 0,
     alive = true,
-    lives = 1,
+    lives = 3,
     starfield,
     starX = 0, starY = 0, starY2 = -600,
     gameStarted = false;
 
-//Array to hold all the enemies on screen
+//Массив, которые держит всех врагов на экране
 for (var i = 0; i < enemyTotal; i++) {
  enemies.push([enemy_x, enemy_y, enemy_w, enemy_h, speed]);
- enemy_x += enemy_w + 60;
-}
+ enemy_x += enemy_w + 60; 
+} 
 
-//Clears the canvas so it can be updated
+//Отчищает канвас
 function clearCanvas() {
  ctx.clearRect(0,0,width,height);
 }
 
-//Cycles through the array and draws the updated enemy position
+//Рисует врагов
 function drawEnemies() {
  for (var i = 0; i < enemies.length; i++) {
    ctx.drawImage(enemy, enemies[i][0], enemies[i][1]);
  }
 }
 
-//If an arrow key is being pressed, moves the ship in the right direction
+//Движение корабля на стрелки
 function drawShip() {
  if (rightKey) ship_x += 5;
  else if (leftKey) ship_x -= 5;
@@ -76,18 +76,20 @@ function drawShip() {
   ctx.drawImage(ship, ship_x, ship_y);
 }
 
-//This moves the enemies downwards on the canvas and if one passes the bottom of the canvas, it moves it to above the canvas
+//Двигает врагов вниз, как только пересекают низ, то телепортирует их в рандомное место сверху и высота тож рандом
 function moveEnemies() {
   for (var i = 0; i < enemies.length; i++) {
    if (enemies[i][1] < height) {
      enemies[i][1] += enemies[i][4];
    } else if (enemies[i][1] > height - 1) {
-      enemies[i][1] = -45;
+      enemies[i][1] = (Math.random()*200)*(-1);
+      enemies[i][0] = (Math.random() * 500)+25;
+      
     }
   }
 }
 
-//If there are lasers in the lasers array, then this will draw them on the canvas
+//Рисуем лазеры в канвасе
 function drawLaser() {
   if (lasers.length)
     for (var i = 0; i < lasers.length; i++) {
@@ -96,7 +98,7 @@ function drawLaser() {
    }
 }
 
-//If we're drawing lasers on the canvas, this moves them up the canvas
+//Двигает лазеры в канвасе
 function moveLaser() {
  for (var i = 0; i < lasers.length; i++) {
    if (lasers[i][1] > -11) {
@@ -107,7 +109,7 @@ function moveLaser() {
  }
 }
 
-//Runs a couple of loops to see if any of the lasers have hit any of the enemies
+//Запускает несколько циклов для проверки попадания лазера
 function hitTest() {
  var remove = false;
  for (var i = 0; i < lasers.length; i++) {
@@ -116,7 +118,7 @@ function hitTest() {
        remove = true;
         enemies.splice(j, 1);
         score += 10;
-        enemies.push([(Math.random() * 500) + 50, -45, enemy_w, enemy_h, speed]);
+        enemies.push([(Math.random() * 500) , -45, enemy_w, enemy_h, speed]);
       }
     }
     if (remove == true) {
@@ -126,7 +128,7 @@ function hitTest() {
   }
 }
 
-//Similar to the laser hit test, this function checks to see if the player's ship collides with any of the enemies
+//Коллизия с врагами на получение урона(заметил баг, что если влететь прямо носом в серединку врага, то не получаешь урон, нужно фиксить)
 function shipCollision() {
   var ship_xw = ship_x + ship_w,
       ship_yh = ship_y + ship_h;
@@ -146,7 +148,9 @@ function shipCollision() {
   }
 }
 
-//This function runs whenever the player's ship hits an enemy and either subtracts a life or sets the alive variable to false if the player runs out of lives
+
+
+//Проверяет, кол-во жизней и решает, что с тобой делать, проверяет после столкновения, заменим на неуязвимость, как сделаем
 function checkLives() {
   lives -= 1;
   if (lives > 0) {
@@ -156,7 +160,7 @@ function checkLives() {
   }
 }
 
-//This simply resets the ship and enemies to their starting positions
+//Этот резет вообще не понадобится, как сделаем неуязвимость, возвращает всё на начальные позиции
 function reset() {
   var enemy_reset_x = 50;
   ship_x = (width / 2) - 25, ship_y = height - 75, ship_w = 50, ship_h = 57;
@@ -167,7 +171,14 @@ function reset() {
  }
 }
 
-//After the player loses all their lives, the continue button is shown and if clicked, it resets the game and removes the event listener for the continue button
+//Понадобится, как сделаем неуязвимость
+function minireset() {
+  var enemy_reset_x = 50;
+  ship_x = (width / 2) - 25, ship_y = height - 75, ship_w = 50, ship_h = 57;
+  
+}
+
+//Кнопка продолжить
 function continueButton(e) {
  var cursorPos = getCursorPos(e);
  if (cursorPos.x > (width / 2) - 53 && cursorPos.x < (width / 2) + 47 && cursorPos.y > (height / 2) + 10 && cursorPos.y < (height / 2) + 50) {
@@ -178,6 +189,7 @@ function continueButton(e) {
   }
 }
 
+//Кнопка главного меню
 function mainmenuButton(e) {
  var cursorPos = getCursorPos(e);
  if (cursorPos.x > (width / 2) - 53 && cursorPos.x < (width / 2) + 47 && cursorPos.y > (height / 2) + 55 && cursorPos.y < (height / 2) + 95) {
@@ -191,13 +203,13 @@ function mainmenuButton(e) {
   }
 }
 
-//holds the cursors position
+//Позиция курсора для нажатия на кнопки продолжить и меню
 function cursorPosition(x,y) {
   this.x = x;
   this.y = y;
 }
 
-//finds the cursor's position after the mouse is clicked
+//Находить позицию курсора после клика мыши по экрану
 function getCursorPos(e) {
   var x;
   var y;
@@ -214,7 +226,7 @@ function getCursorPos(e) {
   return cursorPos;
 }
 
-//Draws the text for the score and lives on the canvas and if the player runs out of lives, it's draws the game over text and continue button as well as adding the event listener for the continue button
+//Рисует слова на экране в том числе жизни и счёт постоянно, а главное меню и меню проигрыша по ситуации
 function scoreTotal() {
   ctx.font = 'bold 20px VT323';
   ctx.fillStyle = '#fff';
@@ -244,7 +256,7 @@ function scoreTotal() {
   }
 }
 
-//Draws and animates the background starfield
+//Рисует и анимирует задник
 function drawStarfield() {
   ctx.drawImage(starfield,starX,starY);
   ctx.drawImage(starfield,starX,starY2);
@@ -258,7 +270,7 @@ function drawStarfield() {
   starY2 += 1;
 }
 
-//The initial function called when the page first loads. Loads the ship, enemy and starfield images and adds the event listeners for the arrow keys. It then calls the gameLoop function.
+//Фунуция инициализации, которая вызывается при загрузке страницы прорисовывая все элементы и создающая триггеры нажатия
 function init() {
   canvas = document.getElementById('canvas');
   ctx = canvas.getContext('2d');
@@ -274,17 +286,19 @@ function init() {
   gameLoop();
 }
 
+//написал для кнопки главного меню в меню проигрыша, чтобы не пришлось загружать всё по новой, а только изначальный экран
 function miniInit(){
     canvas.addEventListener('click', gameStart, false);
     
 }
 
+//функция, показывающая, что игра началась
 function gameStart() {
   gameStarted = true;
   canvas.removeEventListener('click', gameStart, false);
 }
 
-//The main function of the game, it calls all the other functions needed to make the game run
+//Игровой цикл 
 function gameLoop() {
   clearCanvas();
   drawStarfield()
@@ -302,7 +316,7 @@ function gameLoop() {
 }
 
 
-//Checks to see which key has been pressed and either to move the ship or fire a laser
+//Смотрит, какая клавиша нажата и говорит кораблю, что делать
 function keyDown(e) {
   if (e.keyCode == 39) rightKey = true;
   else if (e.keyCode == 37) leftKey = true;
@@ -311,7 +325,7 @@ function keyDown(e) {
   if (e.keyCode == 88 && lasers.length <= laserTotal) lasers.push([ship_x + 25, ship_y - 20, 4, 20]);
 }
 
-//Checks to see if a pressed key has been released and stops the ships movement if it has
+//Смотрит, какую клавишу отпустили, чтобы прекратить движение
 function keyUp(e) {
   if (e.keyCode == 39) rightKey = false;
   else if (e.keyCode == 37) leftKey = false;
