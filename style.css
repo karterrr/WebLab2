@@ -6,6 +6,7 @@ body {
     background:#666;
   }
   canvas {
+    font-family: 'VT323';
     display:block;
     margin:30px auto 0;
     border:1px dashed #ccc;
