@@ -1,15 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet');
-body {
-    font-family: 'VT323';
-    padding:0;
-    margin:0;
-    background:#666;
-  }
-  canvas {
-    font-family: 'VT323';
-    display:block;
-    margin:30px auto 0;
-    border:1px dashed #ccc;
-    background:#000;
-  }
-
+body{
+    background-image: url(img/background.jpg);
+    background-size: cover;
+}
+#wrapper{
+    width: 900px;
+    margin: 0 auto;
+}
